@@ -1,0 +1,9 @@
+{
+  "name": "sessions",
+  "version": "0.4.1",
+  "author": {
+    "name": "Mike"
+  },
+  "description": "/sessions zeigt alle laufenden Claude-Sessions mit Thema, Kontext und Cache-Stand; /pause lässt die warmen ihren Stand in die Datei schreiben, die ihre Pickup-Phrase einliest; /pause neu startet sie danach frisch, aber nur, wenn ihr neuer Stand nachweislich in dieser Datei steht. /pause selbst sichert und startet nur diese Session neu; /pause auto (für den Auto-Neustart des verbrauch-Mods) schickt danach die Phrase selbst ab und lässt die Session weiterarbeiten, wenn ihre Sicherung Auto-Weiter: ja mit der Kennung dieser Sicherung sagt.",
+  "types": "./types/index.d.ts"
+}

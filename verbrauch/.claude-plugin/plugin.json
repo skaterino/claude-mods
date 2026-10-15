@@ -1,0 +1,9 @@
+{
+  "name": "verbrauch",
+  "version": "0.7.2",
+  "author": {
+    "name": "Mike"
+  },
+  "description": "Statuszeile mit Balken für 5-h- und 7-Tage-Verbrauch, Kontext und Cache; /verbrauch zeigt alles farbig mit Prognose im Pane; warnt ab 250k Kontext und bei knappem Limit; teilt die frischeste Limit-Messung zwischen allen Sessions; hält einen Prompt einmal an, wenn er einen kalten Cache teuer neu schreiben würde. Zeigt die Pickup-Datei der Session und hat einen Knopf „Sichern & neu starten“ (mit Nachfrage, braucht den sessions-Mod). Zeigt laufende Hintergrund-Agenten, -Shells und -Tasks mit Laufzeit, Status und geschätzten Kosten je Agent (Statuszeile ⏳, Pane-Block „Hintergrund“, Abgleich mit dem API-Gegenwert der Engine). Auto-Neustart pro Session (/auto, Pane, Statuszeile 🔁): ab einer Kontextgrenze sichert die Session am Turn-Ende selbst, startet frisch mit ihrer Pickup-Phrase und arbeitet weiter, mit 30-s-Countdown, Kettenbremse und Sperre für Prod-Deploys in der Kette (braucht den sessions-Mod 0.4).",
+  "types": "./types/index.d.ts"
+}

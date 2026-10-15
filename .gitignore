@@ -1,0 +1,5 @@
+# Eigenes Repo (github.com/skaterino/claude-clean-view)
+clean-view/
+# Schreibt Claude Code bei jedem Laden des Mods
+.claude-plugin/types/
+.DS_Store
