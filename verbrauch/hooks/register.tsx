@@ -1383,8 +1383,10 @@ export const register: Register = on => {
     const cost =
       `Cache abgelaufen, letzte Antwort vor ${fmtIdle(now - last)}: Dieser Prompt schreibt ` +
       `${fmtTokens(tokens)} Kontext neu, etwa ${factor}-mal so teuer wie das Lesen aus dem warmen Cache.`
-    // Ein Bild käme nicht zurück ins Feld: dann nur melden.
-    if (e.attachments?.length) {
+    // Ein Bild käme nicht zurück ins Feld: dann nur melden. Ebenso vom Telefon (Remote Control): Den Grund des
+    // Verwerfens, Toasts und das Feld zeigt nur das Terminal, einen Weg in die App hat ein Plugin nicht. Dort
+    // verschwände der Prompt sonst still, und das Feld überschriebe im Terminal einen Entwurf.
+    if (e.attachments?.length || e.origin.kind === 'bridge') {
       $.ui.toast(cost, { timeoutMs: 10_000 })
       return next(e)
     }

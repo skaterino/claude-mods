@@ -117,6 +117,8 @@ const engine = (on: On, rows: Row[] = [], stored: Record<string, unknown> = {}) 
 
 const TURN = { answer: 'ok', durationMs: 1_000, isAborted: false, turnId: 't1', reason: 'answer' } as const
 const typed = (text: string) => ({ text, wait: false, origin: { kind: 'composer' } }) as const
+// Vom Telefon oder aus Claude Desktop über Remote Control.
+const phone = (text: string) => ({ text, wait: false, origin: { kind: 'bridge' } }) as const
 const START_ARGS = { cwd: 'C:/test', surface: 'terminal', isInteractive: true } as const
 const COMMAND = {
   command: 'verbrauch',
@@ -217,6 +219,26 @@ test('Cache-Sperre hält nach über einer Stunde Pause einmal an, das zweite Ent
   await $.turn.complete(TURN)
   await clock.advance(15_000)
   expect(lastOf(seen.status)).toMatch(/446k ⚠ wechseln │ ● warm 60′$/)
+})
+
+test('Cache-Sperre: ein Prompt vom Telefon geht durch, die Warnung kommt als Toast ins Terminal', async ($, on) => {
+  const clock = mock.clock(on, { now: START })
+  const seen = engine(on, [{ role: 'user', text: 'mods pickup', toolUses: [] }])
+  seen.usage = usage(446_000, 10, 20)
+  await $.session.start(START_ARGS)
+  await $.turn.complete(TURN)
+
+  // Angehalten hiesse in der App: verschwunden, ohne Grund (den zeigt nur das Terminal).
+  await clock.advance(61 * MIN)
+  expect(await $.prompt.submit(phone('ja'))).toEqual({ text: 'ja' })
+  expect(lastOf(seen.toasts)).toBe(
+    'Cache abgelaufen, letzte Antwort vor 61 Min.: Dieser Prompt schreibt 446k Kontext neu, etwa 40-mal so teuer ' +
+      'wie das Lesen aus dem warmen Cache.',
+  )
+  // Nichts ins Feld: das wäre das im Terminal.
+  await clock.advance(200)
+  expect(seen.fills).toEqual([])
+  expect(seen.entered).toEqual(['ja'])
 })
 
 test('Cache-Sperre nennt den Faktor des laufenden Modells', async ($, on) => {

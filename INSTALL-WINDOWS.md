@@ -4,7 +4,7 @@ Diese Anleitung ist für Claude Code auf Mikes Windows-Rechner. Sie installiert 
 diesem Repo und auf Wunsch `clean-view`. Die Schritte nacheinander abarbeiten und jeden Prüfpunkt wirklich prüfen, nicht
 annehmen.
 
-Stand des Repos: verbrauch 0.7.2, sessions 0.4.1. Entwickelt und getestet auf dem Mac (Claude Code 2.1.296). Auf Windows
+Stand des Repos: verbrauch 0.7.3, sessions 0.4.1. Entwickelt und getestet auf dem Mac (Claude Code 2.1.296). Auf Windows
 ist es noch nicht getestet. Was dort anders ist, steht unter „Bekannte Unterschiede“.
 
 ## Was vorher klar sein muss
