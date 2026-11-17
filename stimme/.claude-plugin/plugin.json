@@ -1,0 +1,9 @@
+{
+  "name": "stimme",
+  "version": "0.4.1",
+  "author": {
+    "name": "Mike"
+  },
+  "description": "Nur Windows: liest die Antworten lokal vor (eigene Piper-Stimmen, Notweg Windows-Stimme Karsten), mit Knöpfen oben im /verbrauch-Pane (Vorlesen an/aus, Pause, Stopp, Nochmal, Diktieren per Win+H, Tempo, Stimme, Ausgabegerät) und /vorlesen, /diktat. Bluetooth-Kopfhörer vor USB-Headset vor Realtek. Auf dem Mac still.",
+  "types": "./types/index.d.ts"
+}

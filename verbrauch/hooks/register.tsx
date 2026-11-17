@@ -1404,7 +1404,7 @@ export const register: Register = on => {
     }
   })
 
-  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e, next) => {
     const elements = $.ui.resolve(e)
     const { Box, Button, Text } = elements
     // Felder nur, wo die Oberfläche sie zeichnet (nicht in der Mobile-App): dort −/+ und der Befehl. Nach e.surface,
@@ -1732,8 +1732,12 @@ export const register: Register = on => {
       )
     }
 
+    // Platz oben für Zeilen anderer Mods, die unter diesem Hook zeichnen (z. B. „stimme“); ohne solche leer
+    const fremd = await Promise.resolve(next(e)).catch(() => null)
+
     return (
       <Box flexDirection="column">
+        {fremd ?? ''}
         {limitRows.length ? limitRows : <Text dimColor>Keine Limit-Angaben, erst nach dem ersten Call</Text>}
         <Box marginTop={1} flexDirection="column">
           {contextRow}

@@ -4,8 +4,9 @@ Mikes Mods für Claude Code, auf Deutsch. Entwickelt auf dem Mac mini, MIT-Lizen
 
 | Mod | Version | Kurz |
 |---|---|---|
-| `verbrauch/` | 0.7.3 | Statuszeile + `/verbrauch`-Pane: 5-h-/7-Tage-Limits, Kontext, Cache-Sperre, Hintergrund-Agenten, Auto-Neustart (`/auto`) |
+| `verbrauch/` | 0.7.4 | Statuszeile + `/verbrauch`-Pane: 5-h-/7-Tage-Limits, Kontext, Cache-Sperre, Hintergrund-Agenten, Auto-Neustart (`/auto`); oben Platz für Zeilen anderer Mods |
 | `sessions/` | 0.4.1 | `/sessions`, `/pause` (sichern, `neu`, `selbst`, `auto`, `abbrechen`) |
+| `stimme/` | 0.4.1 | **Nur Windows.** Vorlesen mit eigenen Piper-Stimmen, Diktieren per Win+H, Knöpfe oben im `/verbrauch`-Pane. Siehe [stimme/README.md](stimme/README.md) |
 
 `clean-view` hat ein eigenes öffentliches Repo: https://github.com/skaterino/claude-clean-view
 
