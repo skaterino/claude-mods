@@ -9,11 +9,14 @@ Firmen-Proxy `/rc` blockt. Kein Text verlässt den Rechner.
   (höchstens 6000 Zeichen). Ein neuer Prompt stoppt die Stimme. An/aus gilt pro Session, sonst reden parallele
   Sessions durcheinander.
 - **Knopfzeile oben im `/verbrauch`-Pane**: Vorlesen an/aus, Pause/Weiter, Stopp, Nochmal (letzte Antwort neu),
-  Diktieren, Tempo −/+ (1.0 = natürlich), Stimme (reihum), Ausgabe (automatisch oder ein bestimmtes Gerät).
-  Braucht verbrauch ab 0.7.4 (das Pane gibt dort oben Platz für andere Mods).
-- **Befehle**: `/vorlesen an | aus | stopp | pause | nochmal | stimme [name] | ausgabe | test`, `/diktat`.
+  Diktieren, Diktat: DE/EN (Sprache wechseln), Tempo −/+ (1.0 = natürlich), Stimme (reihum), Ausgabe (automatisch
+  oder ein bestimmtes Gerät). Braucht verbrauch ab 0.7.4 (das Pane gibt dort oben Platz für andere Mods).
+- **Befehle**: `/vorlesen an | aus | stopp | pause | nochmal | stimme [name] | ausgabe | test`,
+  `/diktat | de | en | wechseln`.
 - **Diktieren**: Win+H kennt Deutsch (Schweiz) nicht. `/diktat` und der Knopf stellen alle Terminal-Fenster auf
-  Deutsch (Deutschland) mit Schweizer Tastatur; der Knopf drückt danach Esc (Fokus zurück in die Eingabe) und Win+H.
+  Deutsch (Deutschland) oder Englisch (USA), beide mit Schweizer Tastatur; fehlt die Sprache in der Windows-Sprachliste,
+  wird sie ergänzt (nur Benutzer, kein Admin). Der Knopf „Diktieren“ drückt danach Esc (Fokus zurück in die Eingabe)
+  und Win+H. Die gewählte Sprache gilt für alle Sessions und bleibt über einen Neustart.
 - **Ausgabegerät automatisch**: Bluetooth-Kopfhörer (Stereo vor Freisprech) > USB-Headset > Realtek > Windows-Standard.
   Der Windows-Standard selbst bleibt unverändert.
 

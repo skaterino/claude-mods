@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { StimmeStatus } from '../types'
+import type { DiktatSprache, StimmeStatus } from '../types'
 
 // Vorlesen der Antworten mit lokalen Piper-Stimmen (Mikes eigene, Standard Danneberg; Notweg Windows-Stimme Karsten),
 // Knöpfe im Verbrauch-Fenster,
@@ -31,6 +31,9 @@ const letzter = atom({ plugin: 'stimme', key: 'letzter' } as const, '')
 const stimmeWahl = atom({ plugin: 'stimme', key: 'stimme' } as const, STIMME_STANDARD as string)
 /** Gewähltes Ausgabegerät als "BUS|Name" (wie scripts/geraete.ps1 es liefert); '' = automatisch (BT > USB-Headset > Realtek). */
 const geraetWahl = atom({ plugin: 'stimme', key: 'geraet' } as const, '')
+/** Sprache fürs Diktieren mit Win+H; gilt für alle Sessions (Store), die Tastatur bleibt Schweizerdeutsch. */
+const diktatSprache = atom({ plugin: 'stimme', key: 'diktat' } as const, 'de' as DiktatSprache)
+const SPRACHE_TITEL: Record<DiktatSprache, string> = { de: 'Deutsch (Deutschland)', en: 'Englisch (USA)' }
 
 /** Kurzer Name fürs Fenster: "Speakers (Realtek(R) Audio)" → "Realtek(R) Audio", Bildschirme nach ihrem Modell, BT markiert. */
 export function geraetTitel(eintrag: string): string {
@@ -233,14 +236,24 @@ async function vorlesenUmschalten($: EngineInterface, wunsch?: boolean) {
 }
 
 async function diktieren($: EngineInterface, mitWinH: boolean) {
-  const args = ['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', skript($, 'diktat.ps1')]
+  const sprache = await read($, diktatSprache)
+  const args = ['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', skript($, 'diktat.ps1'), '-Sprache', sprache]
   const r = await $.process.run(mitWinH ? [...args, '-WinH'] : args, { timeoutMs: 20_000 })
   const zahl = r.stdout.trim().split(/\r?\n/).pop() ?? ''
   if (r.exitCode !== 0 || !/^\d+\/\d+$/.test(zahl)) {
     return `Umstellen hat nicht geklappt: ${(r.stderr || r.stdout).trim().slice(0, 300)}`
   }
 
-  return `Terminal-Fenster auf Deutsch (Deutschland) gestellt (${zahl}).`
+  return `Terminal-Fenster auf ${SPRACHE_TITEL[sprache]} gestellt (${zahl}).`
+}
+
+/** Wechselt die Diktat-Sprache (ohne Angabe: umschalten) und stellt die Terminal-Fenster gleich um, ohne Win+H. */
+async function spracheWechseln($: EngineInterface, wunsch?: DiktatSprache) {
+  const neu: DiktatSprache = wunsch ?? ((await read($, diktatSprache)) === 'de' ? 'en' : 'de')
+  await update($, diktatSprache, () => neu)
+  await $.store.set('diktat', neu)
+
+  return diktieren($, false)
 }
 
 /** Alle Texte der Antworten seit dem letzten Prompt, in Reihenfolge; ersatzweise der Schlusstext. */
@@ -286,7 +299,7 @@ export const register: Register = on => {
     })
     await $.command.register({
       name: 'diktat',
-      description: 'Terminal auf Deutsch (Deutschland) stellen, damit Win+H diktiert',
+      description: 'Terminal für Win+H umstellen: /diktat (aktuelle Sprache) | de | en | wechseln',
     })
     // Mit Piper heisst Tempo 1.0 „natürlich“; das alte Karsten-Tempo (Standard 1.4) einmalig zurücksetzen
     if ((await $.store.get('tempoSkala')) !== 'piper') {
@@ -299,6 +312,8 @@ export const register: Register = on => {
     if (typeof stimme === 'string' && stimme) await update($, stimmeWahl, () => stimme)
     const geraet = await $.store.get('geraet')
     if (typeof geraet === 'string') await update($, geraetWahl, () => geraet)
+    const sprache = await $.store.get('diktat')
+    if (sprache === 'de' || sprache === 'en') await update($, diktatSprache, () => sprache)
 
     return next(e)
   })
@@ -347,8 +362,16 @@ export const register: Register = on => {
     return { text: `Vorlesen ist ${istAn ? 'an' : 'aus'}, Tempo ${(await read($, tempo)).toFixed(1)}. Befehle: /vorlesen an | aus | stopp | pause | nochmal | stimme [name] | ausgabe | test` }
   })
 
-  on('command.run', { command: 'diktat' }, async $ => {
-    return { text: `${await diktieren($, false)} Jetzt mit Win+H diktieren.` }
+  on('command.run', { command: 'diktat' }, async ($, e) => {
+    const wunsch = e.args.trim().toLowerCase()
+    let meldung: string
+    if (wunsch === 'de' || wunsch === 'deutsch') meldung = await spracheWechseln($, 'de')
+    else if (wunsch === 'en' || wunsch === 'englisch' || wunsch === 'english') meldung = await spracheWechseln($, 'en')
+    else if (wunsch === 'wechseln' || wunsch === 'um') meldung = await spracheWechseln($)
+    else if (wunsch) return { text: 'Befehle: /diktat | de | en | wechseln' }
+    else meldung = await diktieren($, false)
+
+    return { text: `${meldung} Jetzt mit Win+H diktieren.` }
   })
 
   on('prompt.submit', async ($, e, next) => {
@@ -384,6 +407,7 @@ export const register: Register = on => {
     const t = await read($, tempo)
     const stimmeJetzt = await read($, stimmeWahl)
     const geraetJetzt = await read($, geraetWahl)
+    const spracheJetzt = await read($, diktatSprache)
     const laeuft = jetzt !== 'still'
 
     return (
@@ -420,6 +444,11 @@ export const register: Register = on => {
               const meldung = await diktieren($, true)
               if (meldung.startsWith('Umstellen')) $.ui.toast(meldung)
             }}
+          />
+          <Button
+            key="stimme-diktat-sprache"
+            label={`Diktat: ${spracheJetzt.toUpperCase()}`}
+            onPress={async () => $.ui.toast(await spracheWechseln($))}
           />
         </Box>
         <Box flexDirection="row" flexWrap="wrap">
